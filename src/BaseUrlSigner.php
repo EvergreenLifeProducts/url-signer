@@ -3,6 +3,7 @@
 namespace Spatie\UrlSigner;
 
 use DateTime;
+use League\Uri\Components\Query;
 use League\Uri\Http;
 use League\Uri\QueryString;
 use Psr\Http\Message\UriInterface;
@@ -86,7 +87,7 @@ abstract class BaseUrlSigner implements UrlSigner
         $query[$this->expiresParameter] = $expiration;
         $query[$this->signatureParameter] = $signature;
 
-        return $url->withQuery($this->buildQueryStringFromArray($query));
+        return $url->withQuery(Query::createFromParams($query));
     }
 
     /**
@@ -175,7 +176,7 @@ abstract class BaseUrlSigner implements UrlSigner
         unset($intendedQuery[$this->expiresParameter]);
         unset($intendedQuery[$this->signatureParameter]);
 
-        return $url->withQuery($this->buildQueryStringFromArray($intendedQuery));
+        return $url->withQuery(Query::createFromParams($intendedQuery));
     }
 
     /**
@@ -225,22 +226,5 @@ abstract class BaseUrlSigner implements UrlSigner
         $validSignature = $this->createSignature($intendedUrl, $expiration);
 
         return hash_equals($validSignature, $providedSignature);
-    }
-
-    /**
-     * Turn a key => value associate array into a query string.
-     *
-     * @param array $query
-     *
-     * @return string|null
-     */
-    protected function buildQueryStringFromArray(array $query)
-    {
-        $buildQuery = [];
-        foreach ($query as $key => $value) {
-            $buildQuery[] = [$key, $value];
-        }
-
-        return QueryString::build($buildQuery);
     }
 }

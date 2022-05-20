@@ -112,18 +112,17 @@ class MD5UrlSignerTest extends TestCase
     /** @test */
     public function it_keeps_the_urls_query_parameters_intact()
     {
-        $url = 'https://myapp.com/?foo=bar&baz=qux';
+        $url = 'https://myapp.com/?foo%5Balfa%5D=bar&foo%5Bbeta%5D=tux&baz=qux';
         $expiration = DateTime::createFromFormat(
             'd/m/Y H:i:s',
             '10/08/2115 18:15:44',
             new DateTimeZone('Europe/Brussels')
         );
-        $expected = 'https://myapp.com/?foo=bar&baz=qux&expires=4594900544&signature=728971d9fd0682793d2a1e96b734d949';
 
         $urlSigner = new MD5UrlSigner('random_monkey');
         $signedUrl = $urlSigner->sign($url, $expiration);
 
-        $this->assertStringContainsString('?foo=bar&baz=qux', $signedUrl);
+        $this->assertStringContainsString('?foo%5Balfa%5D=bar&foo%5Bbeta%5D=tux&baz=qux', $signedUrl);
         $this->assertTrue($urlSigner->validate($signedUrl));
     }
 }
